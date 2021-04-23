@@ -1,3 +1,4 @@
+const { Transaction } = require('./transaction');
 const SHA256 = require('crypto-js/sha256');
 
 class Block {
@@ -6,15 +7,13 @@ class Block {
      * @param {number} timestamp
      * @param {Transaction[]} transactions
      * @param {string} previousHash
-     * @param {number} difficulty
      */
-    constructor(index, timestamp, transactions, previousHash = '', difficulty) {
+    constructor(index, timestamp, transactions, previousHash = '') {
         this.index = index;
         this.timestamp = timestamp;
         this.transactions = transactions;
         this.previousHash = previousHash;
         this.nonce = 0;
-        this.difficulty = difficulty;
         this.hash = this.calculateHash();
     }
 
@@ -29,16 +28,31 @@ class Block {
     /**
      * Starts the mining process on the block. It changes the 'nonce' until the
      * hash of the block starts with enough zeros (=difficulty)
+     * @param {number} difficulty
      * @return {string}
      */
-    mineBlock() {
-        while (this.hash.substring(0, this.difficulty) !== Array(this.difficulty + 1).join('0')) {
+    mineBlock(difficulty) {
+        while (this.hash.substring(0, difficulty) !== Array(difficulty + 1).join('0')) {
             this.nonce++;
             this.hash = this.calculateHash();
         }
 
         console.log("Block mined: " + this.hash);
         return this.hash;
+    }
+
+    /**
+     * Validates all the transactions inside this block (signature + hash)
+     * @returns {boolean}
+     */
+    hasValidTransactions() {
+        for (const tx of this.transactions) {
+            if (!tx.isValid()) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -58,3 +72,5 @@ class Block {
         return true;
     }
 }
+
+module.exports = { Block };
