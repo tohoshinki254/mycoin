@@ -1,4 +1,4 @@
-const { Transaction } = require('./transaction');
+const { Transaction, TxIn, TxOut, UnspentTxOut, isValidTransaction } = require('./transaction');
 const SHA256 = require('crypto-js/sha256');
 
 class Block {
@@ -8,69 +8,69 @@ class Block {
      * @param {Transaction[]} transactions
      * @param {string} previousHash
      */
-    constructor(index, timestamp, transactions, previousHash = '') {
+    constructor(index, timestamp, transactions, previousHash = '', hash) {
         this.index = index;
         this.timestamp = timestamp;
         this.transactions = transactions;
         this.previousHash = previousHash;
         this.nonce = 0;
-        this.hash = this.calculateHash();
-    }
-
-    /**
-     * Return the SHA256 of this block
-     * @return {string}
-     */
-    calculateHash() {
-        return SHA256(this.index + this.timestamp + this.previousHash + JSON.stringify(this.transactions) + this.nonce).toString('hex');
-    }
-
-    /**
-     * Starts the mining process on the block. It changes the 'nonce' until the
-     * hash of the block starts with enough zeros (=difficulty)
-     * @param {number} difficulty
-     * @return {string}
-     */
-    mineBlock(difficulty) {
-        while (this.hash.substring(0, difficulty) !== Array(difficulty + 1).join('0')) {
-            this.nonce++;
-            this.hash = this.calculateHash();
-        }
-
-        console.log("Block mined: " + this.hash);
-        return this.hash;
-    }
-
-    /**
-     * Validates all the transactions inside this block (signature + hash)
-     * @returns {boolean}
-     */
-    hasValidTransactions() {
-        for (const tx of this.transactions) {
-            if (!tx.isValid()) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * Check if the new block is valid
-     * @param {Block} previousBlock 
-     * @returns {boolean}
-     */
-    isValidNewBlock(previousBlock) {
-        if (previousBlock.hash !== this.previousHash) {
-            return false;
-        }
-
-        if (this.calculateHash() !== this.hash) {
-            return false;
-        }
-
-        return true;
+        this.hash = hash;
     }
 }
 
-module.exports = { Block };
+/**
+ * @param {Block} block 
+ * @returns {string}
+ */
+const calculateHashForBlock = (block) => {
+    return SHA256(block.index + block.timestamp + block.previousHash + block.transactions + block.nonce).toString();
+}
+
+/**
+ * @param {Block} block 
+ * @param {UnspentTxOut[]} aUnspentTxOuts
+ * @returns {boolean}
+ */
+const hasValidTransactions = (block, aUnspentTxOuts) => {
+    for (const tx of block.transactions) {
+        if (!isValidTransaction(tx, aUnspentTxOuts)) {
+            return false;
+        }
+    }
+    
+    return true;
+}
+
+/**
+ * @param {Block} block 
+ * @param {number} difficulty 
+ * @returns {string}
+ */
+const mineBlock = (block, difficulty) => {
+    while (block.hash.substring(0, difficulty) !== Array(difficulty + 1).join('0')) {
+        block.nonce++;
+        block.hash = calculateHashForBlock(block);
+    }
+
+    console.log("Block mined: " + block.hash);
+    return block.hash;
+}
+
+/**
+ * @param {Block} currentBlock 
+ * @param {Block} previousBlock 
+ * @returns 
+ */
+const isValidNewBlock = (currentBlock, previousBlock) => {
+    if (previousBlock.hash !== currentBlock.previousHash) {
+        return false;
+    }
+
+    if (calculateHashForBlock(currentBlock) !== currentBlock.hash) {
+        return false;
+    }
+
+    return true;
+}
+
+module.exports = { Block, calculateHashForBlock, mineBlock, hasValidTransactions, isValidNewBlock };

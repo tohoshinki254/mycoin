@@ -2,54 +2,156 @@ const SHA256 = require('crypto-js/sha256');
 const EC = require('elliptic').ec;
 const ec = new EC('secp256k1');
 
-class Transaction {
+class TxOut {
     /**
-     * @param {string} fromAddress 
-     * @param {string} toAddress 
+     * @param {string} address 
      * @param {number} amount 
      */
-    constructor(fromAddress, toAddress, amount) {
-        this.fromAddress = fromAddress;
-        this.toAddress = toAddress;
+    constructor(address, amount) {
+        this.address = address;
         this.amount = amount;
-        this.timestamp = Date.now();
-    }
-
-    /**
-     * Creates a SHA256 hash of the transaction
-     * @returns {string}
-     */
-    calculateHash() {
-        return SHA256(this.fromAddress + this.toAddress + this.amount + this.timestamp).toString('hex');
-    }
-
-    /**
-     * @param {string} signingKey 
-     */
-    signTransaction(signingKey) {
-        if (signingKey.getPublic('hex') !== this.fromAddress) {
-            throw new Error('You cannot sign transactions for other wallets');
-        }
-
-        const hashTx = this.calculateHash();
-        const sig = signingKey.sign(hashTx, 'base64');
-        this.signature = sig.toDER('hex');
-    }
-
-    /**
-     * Check if signature is valid. It uses the formAddress as the public key
-     * @returns {boolean}
-     */
-    isValid() {
-        if (this.fromAddress === null) return true;
-
-        if (!this.signature || this.signature.length === 0) {
-            throw new Error('No signature in this transaction');
-        }
-
-        const publicKey = ec.keyFromPublic(this.fromAddress, 'hex');
-        return publicKey.verify(this.calculateHash(), this.signature);
     }
 }
 
-module.exports = { Transaction };
+class TxIn {
+    /**
+     * @param {string} txOutId 
+     * @param {number} txOutIndex 
+     * @param {string} signature 
+     */
+    constructor(txOutId, txOutIndex, signature) {
+        this.txOutId = txOutId;
+        this.txOutIndex = txOutIndex;
+        this.signature = signature;
+    }
+}
+
+class UnspentTxOut {
+    /**
+     * @param {string} txOutId 
+     * @param {number} txOutIndex 
+     * @param {string} address 
+     * @param {number} amount 
+     */
+    constructor(txOutId, txOutIndex, address, amount) {
+        this.txOutId = txOutId;
+        this.txOutIndex = txOutIndex;
+        this.address = address;
+        this.amount = amount;
+    }
+}
+
+class Transaction {
+    /**
+     * @param {string} id 
+     * @param {TxIn[]} txIns 
+     * @param {TxOut[]} txOuts 
+     */
+    constructor(id, txIns, txOuts) {
+        this.id = id;
+        this.txIns = txIns;
+        this.txOuts = txOuts;
+    }
+}
+
+/**
+ * @param {Transaction} transaction 
+ */
+const getTransactionId = (transaction) => {
+    const txInContent = transaction.txIns
+        .map((txIn) => txIn.txOutId + txIn.txOutIndex)
+        .reduce((a, b) => a + b, '');
+    
+    const txOutContent = transaction.txOuts
+        .map((txOut) => txOut.address + txOut.amount)
+        .reduce((a, b) => a + b, '');
+    
+    return SHA256(txInContent + txOutContent).toString();
+}
+
+/**
+ * @param {Transaction} transaction 
+ * @param {UnspentTxOut[]} aUnspentTxOuts 
+ * @returns {boolean}
+ */
+const isValidTransaction = (transaction, aUnspentTxOuts) => {
+    if (getTransactionId(transaction) !== transaction.id) {
+        console.log('Invalid tx id: ' + transaction.id);
+        return false;
+    }
+
+    const hasValidTxIns = transaction.txIns
+        .map((txIn) => validateTxIn(txIn, transaction, aUnspentTxOuts))
+        .reduce((a, b) => a && b, true);
+    if (!hasValidTxIns) {
+        console.log('Some of the txIns are invalid tx: ' + this.id);
+        return false;
+    }
+
+    const totalTxInValues = transaction.txIns
+        .map((txIn) => getTxInAmount(txIn, aUnspentTxOuts))
+        .reduce((a, b) => a + b, 0);
+    
+    const totalTxOutValues = transaction.txOuts
+        .map((txOut) => txOut.amount)
+        .reduce((a, b) => a + b, 0);
+    
+    if (totalTxInValues !== totalTxOutValues) {
+        return false;
+    }
+
+    return true;
+}
+
+/**
+ * @param {TxIn} txIn 
+ * @param {Transaction} transaction 
+ * @param {UnspentTxOut[]} aUnspentTxOuts 
+ * @returns {boolean}
+ */
+const validateTxIn = (txIn, transaction, aUnspentTxOuts) => {
+    const referencedUTxOut = aUnspentTxOuts.find((uTxO) => uTxO.txOutId === txIn.txOutId && uTxO.txOutIndex === txIn.txOutIndex);
+    if (referencedUTxOut == null) {
+        console.log('Referenced txOut not found: ' + JSON.stringify(txIn));
+        return false;
+    }
+
+    const address = referencedUTxOut.address;
+    const key = ec.keyFromPublic(address, 'hex');
+    const validSignature = key.verify(transaction.id, transaction.signature);
+    if (!validSignature) {
+        console.log('Invalid txIn signature: %s txId: %s address: %s', txIn.signature, transaction.id, referencedUTxOut.address);
+        return false;
+    }
+
+    return true;
+}
+
+/**
+ * @param {TxIn} txIn 
+ * @param {UnspentTxOut[]} aUnspentTxOuts 
+ * @returns {number}
+ */
+const getTxInAmount = (txIn, aUnspentTxOuts) => {
+    return findUnspentTxOut(txIn.txOutId, txIn.txOutIndex, aUnspentTxOuts).amount;
+}
+
+/**
+ * @param {string} transactionId 
+ * @param {number} index 
+ * @param {UnspentTxOut[]} aUnspentTxOuts 
+ * @returns 
+ */
+const findUnspentTxOut = (transactionId, index, aUnspentTxOuts) => {
+    return aUnspentTxOuts.find((uTxO) => uTxO.txOutId === transactionId && uTxO.txOutIndex === index);
+}
+
+/**
+ * @param {string} aPrivateKey 
+ * @returns {string}
+ */
+const getPublicKey = (aPrivateKey) => {
+    return ec.keyFromPrivate(aPrivateKey, 'hex').getPublic().encode('hex');
+}
+
+module.exports = { Transaction, TxIn, TxOut, UnspentTxOut, getTransactionId, getPublicKey };
