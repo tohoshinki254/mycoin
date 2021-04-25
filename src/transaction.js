@@ -154,4 +154,40 @@ const getPublicKey = (aPrivateKey) => {
     return ec.keyFromPrivate(aPrivateKey, 'hex').getPublic().encode('hex');
 }
 
-module.exports = { Transaction, TxIn, TxOut, UnspentTxOut, getTransactionId, getPublicKey };
+/**
+ * 
+ * @param {Transaction} transaction 
+ * @param {number} txInIndex 
+ * @param {string} privateKey 
+ * @param {UnspentTxOut[]} aUnspentTxOuts 
+ * @returns {string}
+ */
+const signTxIn = (transaction, txInIndex, privateKey, aUnspentTxOuts) => {
+    const txIn = transaction.txIns[txInIndex];
+
+    const dataToSign = transaction.id;
+    const referencedUnspentTxOut = findUnspentTxOut(txIn.txOutId, txIn.txOutIndex, aUnspentTxOuts);
+    if (referencedUnspentTxOut == null) {
+        console.log('Could not find referenced txOut');
+        throw Error();
+    }
+    const referencedAddress = referencedUnspentTxOut.address;
+
+    if (getPublicKey(privateKey) !== referencedAddress) {
+        console.log("Does not match key");
+        throw Error();
+    }
+
+    const key = ec.keyFromPrivate(privateKey, 'hex');
+    const signature = toHexString(key.sign(dataToSign).toDER());
+
+    return signature;
+}
+
+const toHexString = (byteArray) => {
+    return Array.from(byteArray, (byte) => {
+        return ('0' + (byte & 0xFF).toString(16)).slice(-2);
+    }).join('');
+}
+
+module.exports = { Transaction, TxIn, TxOut, UnspentTxOut, getTransactionId, getPublicKey, signTxIn };

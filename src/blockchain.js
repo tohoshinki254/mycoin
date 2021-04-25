@@ -1,5 +1,5 @@
 const { Block, mineBlock, isValidNewBlock } = require('./block');
-const { Transaction, TxIn, TxOut, UnspentTxOut, getTransactionId, getPublicKey } = require('./transaction');
+const { Transaction, TxIn, TxOut, UnspentTxOut, getTransactionId, getPublicKey, signTxIn } = require('./transaction');
 
 class Blockchain {
     /**
@@ -119,6 +119,10 @@ const sendTransaction = (privateKey, receiverAddress, amount, aUnspentTxOuts, bl
     }
 
     const txIns = usedUnspentTxOuts.map(toUnsignedTxIn);
+    txIns = txIns.map((txIn, index) => {
+        txIn.signature = signTxIn(txIn, index, privateKey, aUnspentTxOuts);
+        return txIn;
+    });
     const txOuts = createTxOuts(senderAddress, receiverAddress, amount, currentAmount - amount);
     const tx = new Transaction('', txIns, txOuts);
     tx.id = getTransactionId(tx);
