@@ -156,24 +156,15 @@ const getPublicKey = (aPrivateKey) => {
 
 /**
  * 
- * @param {Transaction} transaction 
- * @param {number} txInIndex 
+ * @param {Transaction} transaction
  * @param {string} privateKey 
- * @param {UnspentTxOut[]} aUnspentTxOuts 
+ * @param {UnspentTxOut} aUnspentTxOuts 
  * @returns {string}
  */
-const signTxIn = (transaction, txInIndex, privateKey, aUnspentTxOuts) => {
-    const txIn = transaction.txIns[txInIndex];
-
+const signTxIn = (transaction, privateKey, aUnspentTxOuts) => {
     const dataToSign = transaction.id;
-    const referencedUnspentTxOut = findUnspentTxOut(txIn.txOutId, txIn.txOutIndex, aUnspentTxOuts);
-    if (referencedUnspentTxOut == null) {
-        console.log('Could not find referenced txOut');
-        throw Error();
-    }
-    const referencedAddress = referencedUnspentTxOut.address;
 
-    if (getPublicKey(privateKey) !== referencedAddress) {
+    if (getPublicKey(privateKey) !== aUnspentTxOuts.address) {
         console.log("Does not match key");
         throw Error();
     }

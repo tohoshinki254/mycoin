@@ -4,7 +4,7 @@ const SHA256 = require('crypto-js/sha256');
 class Block {
     /**
      * @param {number} index
-     * @param {number} timestamp
+     * @param {Date} timestamp
      * @param {Transaction[]} transactions
      * @param {string} previousHash
      */
@@ -23,7 +23,7 @@ class Block {
  * @returns {string}
  */
 const calculateHashForBlock = (block) => {
-    return SHA256(block.index + block.timestamp + block.previousHash + block.transactions + block.nonce).toString();
+    return SHA256(block.index + block.timestamp.getTime() + block.previousHash + block.transactions + block.nonce).toString();
 }
 
 /**
@@ -49,10 +49,10 @@ const hasValidTransactions = (block, aUnspentTxOuts) => {
 const mineBlock = (block, difficulty) => {
     while (block.hash.substring(0, difficulty) !== Array(difficulty + 1).join('0')) {
         block.nonce++;
+        block.timestamp = new Date();
         block.hash = calculateHashForBlock(block);
     }
 
-    console.log("Block mined: " + block.hash);
     return block.hash;
 }
 

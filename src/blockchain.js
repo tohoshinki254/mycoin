@@ -1,6 +1,5 @@
-const { Block, mineBlock, isValidNewBlock } = require('./block');
+const { Block, mineBlock, isValidNewBlock, calculateHashForBlock } = require('./block');
 const { Transaction, TxIn, TxOut, UnspentTxOut, getTransactionId, getPublicKey, signTxIn } = require('./transaction');
-
 class Blockchain {
     /**
      * @param {Block[]} chain
@@ -10,24 +9,39 @@ class Blockchain {
      * @param {UnspentTxOut[]} unspentTxOut
      */
     constructor() {
-        this.chain = [createGenesisBlock(this.miningReward)];
         this.difficulty = 4;
         this.pendingTransaction = [];
+        this.infoTransaction = [];
         this.miningReward = 100;
         this.unspentTxOut = [];
+        this.chain = [createGenesisBlock(this.miningReward, this)];
     }
 }
 
 /**
  * @param {string} address
  * @param {number} reward
+ * @param {Blockchain} blockchain
  * @returns {Transaction}
  */
-const createCoinbaseTransaction = (address, reward) => {
-    const txIns = new TxIn('', 0, '');
-    const txOuts = new TxOut(address, reward);
+const createCoinbaseTransaction = (address, reward, blockchain) => {
+    const txIns = [new TxIn('', 0, '')];
+    const txOuts = [new TxOut(address, reward)];
     const coinBaseTx = new Transaction('', txIns, txOuts);
     coinBaseTx.id = getTransactionId(coinBaseTx);
+    
+    let idx = 0
+    for (const txOut of txOuts) {
+        const data = {
+            txOutId: coinBaseTx.id,
+            txOutIndex: idx,
+            address: txOut.address,
+            amount: txOut.amount
+        }
+        blockchain.unspentTxOut.push(data);
+        idx++;
+    }
+
     return coinBaseTx;
 }
 
@@ -35,10 +49,10 @@ const createCoinbaseTransaction = (address, reward) => {
  * @param {number} reward
  * @returns {Block} 
  */
-const createGenesisBlock = (reward) => {
-    const transaction = createCoinbaseTransaction('', reward)
-    const genesis = new Block(0, Date.now(), transaction, "0");
-    genesis.calculateHash();
+const createGenesisBlock = (reward, blockchain) => {
+    const transaction = [createCoinbaseTransaction('', reward, blockchain)];
+    const genesis = new Block(0, new Date(), transaction, "0");
+    genesis.hash = calculateHashForBlock(genesis);
     return genesis;
 }
 
@@ -53,19 +67,27 @@ const getLatestBlock = (blockchain) => {
 /**
  * @param {string} miningRewardAddress 
  * @param {Blockchain} blockchain
+ * @returns {string}
  */
 const minePendingTransactions = (miningRewardAddress, blockchain) => {
-    const rewardTx = createCoinbaseTransaction(miningRewardAddress, blockchain.miningReward);
+    const rewardTx = createCoinbaseTransaction(miningRewardAddress, blockchain.miningReward, blockchain);
     blockchain.pendingTransaction.push(rewardTx);
 
     const latestBlock = getLatestBlock(blockchain);
-    const block = new Block(latestBlock.index + 1, Date.now(), blockchain.pendingTransaction, latestBlock.hash, '');
-    mineBlock(block, blockchain.difficulty);
+    const block = new Block(latestBlock.index + 1, '', blockchain.pendingTransaction, latestBlock.hash, '');
+    const newHash = mineBlock(block, blockchain.difficulty);
 
-    console.log('Block successfully mined !');
-    blockchain.chain.push(block);
-
-    blockchain.pendingTransaction = [];
+    if (isValidNewBlock(block, latestBlock)) {
+        blockchain.chain.push(block);
+        blockchain.pendingTransaction = [];
+        
+        const info = [];
+        for (const element of blockchain.infoTransaction) {
+            info.push(element);
+        }
+        blockchain.infoTransaction = [];
+        return [newHash, info, block.timestamp];
+    }
 }
 
 /**
@@ -75,17 +97,22 @@ const minePendingTransactions = (miningRewardAddress, blockchain) => {
  * @param {UnspentTxOut[]} aUnspentTxOuts
  * @param {Blockchain} blockchain
  */
-const sendTransaction = (privateKey, receiverAddress, amount, aUnspentTxOuts, blockchain) => {
+const sendTransaction = (privateKey, receiverAddress, amount, blockchain) => {
     const senderAddress = getPublicKey(privateKey);
-    const senderUnspentTxOuts = aUnspentTxOuts.filter((uTxO) => uTxO.address === senderAddress);
 
-    const currentAmount = 0;
-    const usedUnspentTxOuts = [];
-    for (const txOut of senderUnspentTxOuts) {
-        currentAmount += txOut.amount;
-        usedUnspentTxOuts.push(txOut);
-        if (currentAmount >= amount) {
-            break;
+    let currentAmount = 0;
+    let usedUnspentTxOuts = [];
+    let remainTxOuts = [];
+    for (const uTxO of blockchain.unspentTxOut) {
+        if (uTxO.address !== senderAddress) {
+            remainTxOuts.push(uTxO);
+        } else {
+            if (currentAmount < amount) {
+                currentAmount += uTxO.amount;
+                usedUnspentTxOuts.push(uTxO);
+            } else {
+                remainTxOuts.push(uTxO);
+            }
         }
     }
 
@@ -119,15 +146,32 @@ const sendTransaction = (privateKey, receiverAddress, amount, aUnspentTxOuts, bl
     }
 
     const txIns = usedUnspentTxOuts.map(toUnsignedTxIn);
-    txIns = txIns.map((txIn, index) => {
-        txIn.signature = signTxIn(txIn, index, privateKey, aUnspentTxOuts);
-        return txIn;
-    });
+
     const txOuts = createTxOuts(senderAddress, receiverAddress, amount, currentAmount - amount);
+
     const tx = new Transaction('', txIns, txOuts);
     tx.id = getTransactionId(tx);
 
-    blockchain.chain.push(tx);
+    for (let i = 0; i < txIns.length; i++) {
+        txIns[i].signature = signTxIn(tx, privateKey, usedUnspentTxOuts[i]);
+    }
+
+    blockchain.unspentTxOut = remainTxOuts;
+    let idx = 0;
+    for (const txOut of txOuts) {
+        const unSpent = {
+            txOutId: tx.id,
+            txOutIndex: idx,
+            address: txOut.address,
+            amount: txOut.amount
+        };
+        blockchain.unspentTxOut.push(unSpent);
+        idx++;
+    }
+
+    blockchain.pendingTransaction.push(tx);
+    blockchain.infoTransaction.push([senderAddress, receiverAddress, amount]);
+    return true;
 }
 
 /**
@@ -136,7 +180,7 @@ const sendTransaction = (privateKey, receiverAddress, amount, aUnspentTxOuts, bl
  * @returns {number}
  */
 const getBalance = (address, aUnspentTxOuts) => {
-    const balance = 0;
+    let balance = 0;
     for (const uTxO of aUnspentTxOuts) {
         if (uTxO.address === address) {
             balance += uTxO.amount;
