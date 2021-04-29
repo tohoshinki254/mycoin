@@ -38,4 +38,12 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
-module.exports = app;
+const server = require('http').Server(app);
+const io = require('socket.io')(server);
+const configSocket = require('./configs/socket').configSocket;
+
+io.on('connection', async (socket) => {
+  configSocket(socket, io);
+})
+
+module.exports = {app: app, server: server};

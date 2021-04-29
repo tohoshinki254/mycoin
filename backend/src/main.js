@@ -6,6 +6,8 @@ let blockchain = new Blockchain();
 let transactions = [];  // from-to-amount-time
 
 module.exports = {
+    blockchain: blockchain,
+    transactions: transactions,
     initWallet: async (req, res) => {
         try {
             const privateKey = createWallet();
