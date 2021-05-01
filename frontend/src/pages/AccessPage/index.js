@@ -3,7 +3,6 @@ import { Grid, makeStyles } from '@material-ui/core';
 import TopNavigator from '../../components/TopNavigator';
 import MediaCard from '../../components/MediaCard';
 import BottomNavigator from '../../components/BottomNavigator';
-import BlueTextTypography from '../../components/BlueTextTypography';
 import CreateWalletDialog from './create-wallet-dialog';
 import AccessWalletDialog from './access-wallet-dialog';
 
