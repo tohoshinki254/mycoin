@@ -3,7 +3,7 @@ import { Dialog, DialogContent, Button, DialogActions, withStyles } from '@mater
 import BlueTextField from '../../components/BlueTextField';
 import DialogTitle from '../../components/DialogTitle';
 
-const AccessButton = withStyles((theme) => ({
+const SendButton = withStyles((theme) => ({
     root: {
       color: '#05c0a5',
       backgroundColor: 'white',
@@ -13,7 +13,7 @@ const AccessButton = withStyles((theme) => ({
     },
 }))(Button);
 
-const AccessWalletDialog = ({ open, onCloseClick }) => {
+const SendTransactionDialog = ({ open, onCloseClick }) => {
     return (
         <Dialog
             open={open}
@@ -22,18 +22,20 @@ const AccessWalletDialog = ({ open, onCloseClick }) => {
             aria-labelledby="create-wallet-dialog-title"
         >
             <DialogTitle id="create-wallet-dialog-title" onClose={() => onCloseClick()}>
-                Access by Private Key
+                Send Transaction
             </DialogTitle>
             <DialogContent dividers style={{ padding: '5%' }}>
-                <BlueTextField label="Private Key" variant="outlined" style={{width: '100%'}}/>
+                <BlueTextField label="Receiver Address" variant="outlined" style={{width: '100%'}}/>
+                <div style={{ margin: '5%' }}/>
+                <BlueTextField label="Amount" variant="outlined" style={{width: '100%'}}/>
             </DialogContent>
             <DialogActions>
-                <AccessButton autoFocus onClick={() => {}} >
-                    Access Wallet
-                </AccessButton>
+                <SendButton autoFocus onClick={() => {}} >
+                    Send
+                </SendButton>
             </DialogActions>
         </Dialog>
     )
 }
 
-export default AccessWalletDialog;
+export default SendTransactionDialog;

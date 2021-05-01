@@ -23,6 +23,11 @@ const useStyles = makeStyles({
         alignItems: 'center',
         justifyContent: 'center',
         minHeight: 50,
+        position: 'fixed',
+        bottom: 0,
+        left: 0, 
+        right: 0,
+        top: 'auto'
     }
 });
 

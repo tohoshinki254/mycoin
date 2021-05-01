@@ -18,20 +18,15 @@ const AccessPage = () => {
     return (
         <div className={classes.root}>
             <TopNavigator isAccessed={false} />
-            <Grid container style={{ marginTop: '7%' }}>
+            <Grid container style={{ marginTop: '2%' }}>
                 <Grid className={classes.leftBanner} item xs={6}>
-                    <BlueTextTypography variant="h1" component="h1">
-                        My Ether
-                    </BlueTextTypography>
-                    <BlueTextTypography variant="h1" component="h1">
-                        Wallet
-                    </BlueTextTypography>
+                    <img src="/assets/images/logo.5ed2dd34.png" />
                 </Grid>
                 <Grid className={classes.rightBanner} item xs={6}>
                     <img src="/assets/images/big-spaceman.1b378c1b.png" width='70%' height='100%'/>
                 </Grid>
             </Grid>
-            <Grid container>
+            <Grid container style={{ paddingBottom: '7%'}}>
                 <Grid className={classes.createCard} item xs={6}>
                     <MediaCard 
                         title="Create A New Wallet"
@@ -72,7 +67,7 @@ const useStyles = makeStyles({
     rightBanner: {
         display: 'flex',
         flexDirection: 'row',
-        justifyContent: 'flex-start'
+        justifyContent: 'center'
     },
     createCard: {
         display: 'flex',

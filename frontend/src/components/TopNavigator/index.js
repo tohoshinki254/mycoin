@@ -23,11 +23,6 @@ const TopNavigator = ({ isAccessed }) => {
 const useStyles = makeStyles({
     root: {
         flexGrow: 1,
-        position: 'fixed',
-        top: 0,
-        right: 0,
-        left: 0,
-        bottom: 'auto'
     },
     colorDefault: {
         background: '#fff'
