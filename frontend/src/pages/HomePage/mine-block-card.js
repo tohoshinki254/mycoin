@@ -2,7 +2,17 @@ import React, { useState } from 'react';
 import { Card, CardContent, makeStyles, Grid, Button, withStyles } from '@material-ui/core';
 import WhiteTextTypography from '../../components/WhiteTextTypography';
 
-const NetworkCard = () => {
+const MineButton = withStyles((theme) => ({
+    root: {
+      color: '#25b0e8',
+      backgroundColor: 'white',
+      '&:hover': {
+        backgroundColor: 'white',
+      },
+    },
+}))(Button);
+
+const MineBlockCard = () => {
     const classes = useStyles();
     
     return (
@@ -17,14 +27,17 @@ const NetworkCard = () => {
                     </Grid>
                     <Grid item xs={9}>
                         <WhiteTextTypography variant="h5" component="h5">
-                            Network
+                            Mine Block
                         </WhiteTextTypography>
                         <div style={{margin: '2%'}}/>
+                        <MineButton 
+                            onClick={() => {}}
+                        >
+                            Mine
+                        </MineButton>
+                        <div style={{margin: '2%'}}/>
                         <WhiteTextTypography className={classes.breakAll} variant="body1" component="p">
-                            myetherwallet.com(MEW)
-                        </WhiteTextTypography>
-                        <WhiteTextTypography className={classes.breakAll} variant="body1" component="p">
-                            Last block# : 12339248
+                            New block: #1231313
                         </WhiteTextTypography>
                     </Grid>
                 </Grid>
@@ -39,7 +52,7 @@ const useStyles = makeStyles({
         flexDirection: 'column',
         alignItems: 'center',
         width: '90%',
-        height: 150,
+        height: 170,
         backgroundColor: '#25b0e8'
     },
     content: {
@@ -59,4 +72,4 @@ const useStyles = makeStyles({
     }
 });
 
-export default NetworkCard;
+export default MineBlockCard;

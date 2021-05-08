@@ -11,6 +11,10 @@ router.post('/wallet', async (req, res) => {
   controller.initWallet(req, res);
 });
 
+router.post('/access', async (req, res) => {
+  controller.accessWallet(req, res);
+});
+
 router.post('/balance', async (req, res) => {
   controller.getBalanceOfAddress(req, res);
 });

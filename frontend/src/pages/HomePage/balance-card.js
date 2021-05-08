@@ -4,7 +4,7 @@ import WhiteTextTypography from '../../components/WhiteTextTypography';
 import MoreOutlinedIcon from '@material-ui/icons/MoreOutlined';
 import RefreshIcon from '@material-ui/icons/Refresh';
 
-const BalanceCard = ({ balance, openDialog }) => {
+const BalanceCard = ({ balance, openDialog, refreshEvent }) => {
     const classes = useStyles();
     
     return (
@@ -27,10 +27,17 @@ const BalanceCard = ({ balance, openDialog }) => {
                         </WhiteTextTypography>
                         <div style={{margin: '2%'}}/>
                         <div>
-                            <IconButton className={classes.button} onClick={openDialog}>
+                            <IconButton 
+                                className={classes.button} 
+                                onClick={openDialog}
+                            >
                                 <MoreOutlinedIcon />
                             </IconButton>
-                            <IconButton className={classes.button}>
+                            <IconButton 
+                                className={classes.button} 
+                                onClick={refreshEvent}
+                                aria-label="refresh"
+                            >
                                 <RefreshIcon />
                             </IconButton>
                         </div>
@@ -47,7 +54,7 @@ const useStyles = makeStyles({
         flexDirection: 'column',
         alignItems: 'center',
         width: '90%',
-        height: 150,
+        height: 170,
         backgroundColor: '#5a78f0'
     },
     content: {

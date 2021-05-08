@@ -1,20 +1,34 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Grid, makeStyles } from '@material-ui/core';
 import TopNavigator from '../../components/TopNavigator';
 import BottomNavigator from '../../components/BottomNavigator';
 import AddressCard from './address-card';
 import BalanceCard from './balance-card';
-import NetworkCard from './network-card';
 import BalanceDialog from './balance-dialog';
 import SendTransactionCard from './send-transaction-card';
 import SeeBlocksCard from './see-blocks-card';
 import SeeTransactionsCard from './see-transactions-card';
 import SendTransactionDialog from './send-transaction-dialog';
+import MineBlockCard from './mine-block-card';
+import { PRIVATE_KEY, PUBLIC_KEY } from '../../global/constants';
+import * as Actions from '../../actions/actions';
+import { Redirect } from 'react-router';
+import { AppContext } from '../../contexts/AppContext';
 
 const HomePage = () => {
     const classes = useStyles();
+    const { isAccessed } = useContext(AppContext);
     const [openBalanceDialog, setOpenBalanceDialog] = useState(false);
     const [openSendTransactionDialog, setOpenSendTransactionDialog] = useState(false);
+    const [balance, setBalance] = useState({ successful: false, data: null });
+
+    const getBalance = (address) => {
+        Actions.getBalance(address, setBalance);
+    }
+
+    useEffect(() => {
+        getBalance(localStorage.getItem(PUBLIC_KEY));
+    }, []);
 
     const handleCloseBalanceDialog = () => {
         setOpenBalanceDialog(false);
@@ -24,29 +38,42 @@ const HomePage = () => {
         setOpenSendTransactionDialog(false);
     }
 
+    if (!isAccessed) {
+        return <Redirect to='/wallet'/>
+    }
+
     return (
         <div className={classes.root}>
             <TopNavigator isAccessed={false} />
             <Grid container>
-                <Grid className={classes.cardInfo} item xs={4}>
-                    <AddressCard address="0x19E7E376E7C213B7E7e7e46cc70A5dD086DAff2A"/>
+                <Grid className={classes.cardInfo} item xs={6}>
+                    <AddressCard address={localStorage.getItem(PUBLIC_KEY)}/>
                 </Grid>
-                <Grid className={classes.cardInfo} item xs={4}>
-                    <BalanceCard balance="2000" openDialog={() => setOpenBalanceDialog(true)} />
-                </Grid>
-                <Grid className={classes.cardInfo} item xs={4}>
-                    <NetworkCard />
+                <Grid className={classes.cardInfo} item xs={6}>
+                    <BalanceCard 
+                        balance={balance.successful ? balance.data.balance : "-INF"}
+                        openDialog={() => setOpenBalanceDialog(true)}
+                        refreshEvent={() => getBalance(localStorage.getItem(PUBLIC_KEY))}
+                    />
                 </Grid>
             </Grid>
+
             <div style={{ marginBottom: '7%' }}/>
             <Grid container>
-                <Grid className={classes.cardInfo} item xs={4}>
-                    <SendTransactionCard openDialog={() => setOpenSendTransactionDialog(true)}/>
+                <Grid className={classes.cardInfo} item xs={6}>
+                    <MineBlockCard />
                 </Grid>
-                <Grid className={classes.cardInfo} item xs={4}>
+                <Grid className={classes.cardInfo} item xs={6}>
                     <SeeBlocksCard />
                 </Grid>
-                <Grid className={classes.cardInfo} item xs={4}>
+            </Grid>
+
+            <div style={{ marginBottom: '7%' }}/>
+            <Grid container>
+                <Grid className={classes.cardInfo} item xs={6}>
+                    <SendTransactionCard openDialog={() => setOpenSendTransactionDialog(true)}/>
+                </Grid>
+                <Grid className={classes.cardInfo} item xs={6}>
                     <SeeTransactionsCard />
                 </Grid>
             </Grid>
@@ -54,7 +81,11 @@ const HomePage = () => {
             <div style={{ marginBottom: '7%' }}/>
             <BottomNavigator />
 
-            <BalanceDialog open={openBalanceDialog} onCloseClick={handleCloseBalanceDialog} />
+            <BalanceDialog 
+                open={openBalanceDialog} 
+                onCloseClick={handleCloseBalanceDialog} 
+                balance={balance.successful ? balance.data.balance : "-INF"}
+            />
             <SendTransactionDialog open={openSendTransactionDialog} onCloseClick={handleCloseSendTransactionDialog} />
         </div>
     )

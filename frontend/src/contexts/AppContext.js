@@ -1,5 +1,6 @@
 import { createContext } from 'react';
 
 export const AppContext = createContext({
-    isAccessed: false
+    isAccessed: false,
+    setIsAccessed: (value) => {}
 });

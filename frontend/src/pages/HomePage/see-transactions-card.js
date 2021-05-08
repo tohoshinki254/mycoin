@@ -22,7 +22,7 @@ const SeeTransactionsCard = () => {
 const useStyles = makeStyles({
     root: {
         width: '90%',
-        height: 150,
+        height: 170,
         backgroundImage: "url('/assets/images/blocks.jpeg')",
         backgroundSize: '100%',
         cursor: 'pointer'

@@ -22,7 +22,7 @@ const SendTransactionCard = ({ openDialog }) => {
 const useStyles = makeStyles({
     root: {
         width: '90%',
-        height: 150,
+        height: 170,
         backgroundImage: "url('/assets/images/send-transaction.png')",
         backgroundSize: '100%',
         cursor: 'pointer'

@@ -3,7 +3,7 @@ import { Dialog, DialogContent, makeStyles, Grid } from '@material-ui/core';
 import BlueTextTypography from '../../components/BlueTextTypography';
 import DialogTitle from '../../components/DialogTitle';
 
-const BalanceDialog = ({ open, onCloseClick }) => {
+const BalanceDialog = ({ open, onCloseClick, balance }) => {
     const classes = useStyles();
 
     return (
@@ -25,7 +25,7 @@ const BalanceDialog = ({ open, onCloseClick }) => {
                     </Grid>
                     <Grid className={classes.rightGrid} item xs={6}>
                         <BlueTextTypography gutterBottom>
-                            2000 MEW
+                            {balance} MEW
                         </BlueTextTypography>
                     </Grid>
                 </Grid>

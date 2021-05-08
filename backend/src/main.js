@@ -24,6 +24,22 @@ module.exports = {
         }
     },
 
+    accessWallet: async (req, res) => {
+        try {
+            const privateKey = req.body.privateKey;
+            const publicKey = getPublicKey(privateKey);
+            res.status(200).json({
+                message: "OK",
+                privateKey: privateKey,
+                publicKey: publicKey
+            });
+        } catch (e) {
+            res.status(500).json({
+                message: e.message
+            });
+        }
+    },
+
     getBalanceOfAddress: async (req, res) => {
         try {
             const address = req.body.address;

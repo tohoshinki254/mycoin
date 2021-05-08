@@ -36,7 +36,7 @@ const useStyles = makeStyles({
         flexDirection: 'column',
         alignItems: 'center',
         width: '90%',
-        height: 150,
+        height: 170,
         backgroundColor: '#7070e3'
     },
     content: {
