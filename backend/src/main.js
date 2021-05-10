@@ -65,7 +65,7 @@ module.exports = {
                     message: "OK"
                 });
             } else {
-                res.status(501).json({
+                res.status(401).json({
                     message: "Cannot perform the transaction"
                 });
             }
@@ -89,14 +89,15 @@ module.exports = {
                 return;
             }
 
-            for (const element of result[1]) {
-                element.push(result[2]);
-                transactions.push(element);
+            for (const element of result[2]) {
+                element.push(result[3]);
+                transactions.unshift(element);
             }
 
             res.status(200).json({
                 message: 'OK',
-                hash: result[0]
+                index: result[0],
+                reward: result[1]
             });
         } catch (e) {
             res.status(500).json({
@@ -127,7 +128,7 @@ module.exports = {
                         from: transactions[idx][0],
                         to: transactions[idx][1],
                         amount: transactions[idx][2],
-                        time: transactions[idx][3]
+                        time: transactions[idx][3].toLocaleString()
                     };
                     result.push(data);
                 }
@@ -176,7 +177,7 @@ module.exports = {
                     from: totalTransactions[idx][0],
                     to: totalTransactions[idx][1],
                     amount: totalTransactions[idx][2],
-                    time: totalTransactions[idx][3]
+                    time: totalTransactions[idx][3].toLocaleString()
                 };
                 result.push(data);
             }
@@ -209,14 +210,16 @@ module.exports = {
 
             const result = [];
             for (let i = 0; i < SIZE; i++) {
-                const idx = (page - 1) * 10 + i;
-                if (idx >= blockchain.chain.length) break;
+                const idx = (blockchain.chain.length - 1) -  ((page - 1) * 10 + i);
+                if (idx < 0) break;
                 
                 const block = blockchain.chain[idx];
                 const latestTransaction = block.transactions[block.transactions.length - 1];
                 const miner = latestTransaction.txOuts[latestTransaction.txOuts.length - 1].address;
                 const reward = latestTransaction.txOuts[latestTransaction.txOuts.length - 1].amount;
 
+                if (block.index === 0) continue;
+                
                 const data = {
                     index: block.index,
                     time: block.timestamp.toLocaleString(),
@@ -272,18 +275,14 @@ module.exports = {
             }
 
             let totalPages = Math.ceil(blocks.length / SIZE);
-            const mod = blocks.length % SIZE;
             if (page > totalPages) page = totalPages;
 
-            let result;
-            const idx = (page - 1) * 10;
-            if (idx === 0) idx += 1;
-            let sub = 0;
-            if (page === totalPages && page === 1) sub = 1
-            if (page === totalPages) {
-                result = blocks.slice(idx, idx + mod - sub);
-            } else {
-                result = blocks.slice(idx, idx + SIZE);
+            let result = [];
+            for (let i = 0; i < SIZE; i++) {
+                const idx = (blocks.length - 1) -  ((page - 1) * 10 + i);
+                if (idx < 0) break;
+                
+                result.push(blocks[idx]);
             }
 
             res.status(200).json({

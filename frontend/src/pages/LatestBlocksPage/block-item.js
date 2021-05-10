@@ -1,36 +1,35 @@
 import React from 'react';
 import { Grid, makeStyles, Typography } from '@material-ui/core';
 
-const BlockItem = () => {
+const BlockItem = ({ index, time, numberOfTransaction, miner, reward }) => {
     const classes = useStyles();
 
-    // index - time - Txn - 
     return (
         <>
             <Grid className={classes.root} container>
-                <Grid item xs={2}>
+                <Grid item xs={1} className={classes.item}>
                     <Typography variant="body1" component="p" color="primary">
-                        12347179
+                        {index}
                     </Typography>
                 </Grid>
-                <Grid item xs={3}>
+                <Grid item xs={3} className={classes.item}>
                     <Typography variant="body1" component="p">
-                        2020/01/01 12:00:00
+                        {time}
                     </Typography>
                 </Grid>
-                <Grid item xs={1}>
+                <Grid item xs={1} className={classes.item}>
                     <Typography variant="body1" component="p">
-                        200
+                        {numberOfTransaction}
                     </Typography>
                 </Grid>
-                <Grid item xs={5}>
+                <Grid item xs={6} className={classes.item}>
                     <Typography variant="body1" component="p" className={classes.miner}>
-                        0x12412412412412412412412411111111111111111111111
+                        {miner}
                     </Typography>
                 </Grid>
-                <Grid item xs={1}>
+                <Grid item xs={1} className={classes.item}>
                     <Typography variant="body1" component="p">
-                        200
+                        {reward}
                     </Typography>
                 </Grid>
             </Grid>
@@ -49,7 +48,13 @@ const useStyles = makeStyles({
         width: '90%',
         textOverflow: 'ellipsis',
         whiteSpace: 'nowrap',
-        overflow: 'hidden'
+        overflow: 'hidden',
+    },
+    item: {
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center'
     }
 });
 

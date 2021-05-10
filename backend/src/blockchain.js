@@ -86,7 +86,7 @@ const minePendingTransactions = (miningRewardAddress, blockchain) => {
             info.push(element);
         }
         blockchain.infoTransaction = [];
-        return [newHash, info, block.timestamp];
+        return [block.index, blockchain.miningReward, info, block.timestamp];
     }
 }
 
@@ -99,6 +99,10 @@ const minePendingTransactions = (miningRewardAddress, blockchain) => {
  */
 const sendTransaction = (privateKey, receiverAddress, amount, blockchain) => {
     const senderAddress = getPublicKey(privateKey);
+
+    if (senderAddress === receiverAddress) {
+        return false;
+    }
 
     let currentAmount = 0;
     let usedUnspentTxOuts = [];

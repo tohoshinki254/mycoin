@@ -8,17 +8,22 @@ const TableTitle = () => {
     return (
         <>
             <Grid className={classes.root} container>
-                <Grid item xs={5}>
+                <Grid item xs={2} className={classes.item}>
+                    <BoldTextTypography variant="body1" component="p">
+                        Time
+                    </BoldTextTypography>
+                </Grid>
+                <Grid item xs={4} className={classes.item}>
                     <BoldTextTypography variant="body1" component="p">
                         From
                     </BoldTextTypography>
                 </Grid>
-                <Grid item xs={5}>
+                <Grid item xs={4} className={classes.item}>
                     <BoldTextTypography variant="body1" component="p">
                         To
                     </BoldTextTypography>
                 </Grid>
-                <Grid item xs={2}>
+                <Grid item xs={2} className={classes.item}>
                     <BoldTextTypography variant="body1" component="p">
                         Amount
                     </BoldTextTypography>
@@ -36,6 +41,12 @@ const useStyles = makeStyles({
         borderBottomStyle: 'solid',
         borderColor: '#BDBDBD',
         borderWidth: 'thin'
+    },
+    item: {
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center'
     }
 });
 

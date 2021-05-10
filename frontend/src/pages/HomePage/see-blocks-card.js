@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 import { Card, CardContent, makeStyles } from '@material-ui/core';
 import WhiteTextTypography from '../../components/WhiteTextTypography';
 
-const SeeBlocksCard = () => {
+const SeeBlocksCard = ({ clickEvent }) => {
     const classes = useStyles();
 
     return (
-        <Card className={classes.root}>
+        <Card className={classes.root} onClick={clickEvent}>
             <CardContent className={classes.content}>
                 <WhiteTextTypography variant="h4" component="h4">
                     Latest

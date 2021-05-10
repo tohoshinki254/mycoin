@@ -1,20 +1,35 @@
 import React, { useState } from 'react';
-import { Card, CardContent, makeStyles, Grid, Button, withStyles } from '@material-ui/core';
+import { Card, CardContent, makeStyles, Grid, Button, withStyles, CircularProgress } from '@material-ui/core';
 import WhiteTextTypography from '../../components/WhiteTextTypography';
+import * as Actions from '../../actions/actions';
+import { PRIVATE_KEY } from '../../global/constants';
 
 const MineButton = withStyles((theme) => ({
     root: {
-      color: '#25b0e8',
-      backgroundColor: 'white',
-      '&:hover': {
+        color: '#25b0e8',
         backgroundColor: 'white',
-      },
+        '&:hover': {
+            backgroundColor: 'white',
+        },
     },
 }))(Button);
 
+const MineProgress = withStyles((theme) => ({
+    root: {
+        color: 'white'
+    }
+}))(CircularProgress);
+
 const MineBlockCard = () => {
     const classes = useStyles();
-    
+    const [mineState, setMineState] = useState({ successful: false, data: null });
+    const [progress, setProgress] = useState(false);
+
+    const mineBlockEvent = () => {
+        setProgress(true);
+        Actions.mineBlock(localStorage.getItem(PRIVATE_KEY), setMineState, setProgress);
+    }
+
     return (
         <Card className={classes.root} >
             <CardContent className={classes.content}>
@@ -30,15 +45,23 @@ const MineBlockCard = () => {
                             Mine Block
                         </WhiteTextTypography>
                         <div style={{margin: '2%'}}/>
-                        <MineButton 
-                            onClick={() => {}}
-                        >
-                            Mine
-                        </MineButton>
+                        <div style={{ display: 'flex', flexDirection: 'row'}}>
+                            <MineButton 
+                                onClick={() => mineBlockEvent()}
+                            >
+                                Mine
+                            </MineButton>
+                            {progress && <MineProgress style={{ marginLeft: '10%' }}/>}
+                        </div>
+                        
                         <div style={{margin: '2%'}}/>
-                        <WhiteTextTypography className={classes.breakAll} variant="body1" component="p">
-                            New block: #1231313
-                        </WhiteTextTypography>
+                        {
+                            mineState.successful && 
+                            <WhiteTextTypography className={classes.breakAll} variant="body1" component="p">
+                                New block: #{mineState.data.index} <br />
+                                Rewarded: {mineState.data.reward}
+                            </WhiteTextTypography>
+                        }
                     </Grid>
                 </Grid>
             </CardContent>

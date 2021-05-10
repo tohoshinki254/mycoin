@@ -1,25 +1,30 @@
 import React from 'react';
 import { Grid, makeStyles, Typography } from '@material-ui/core';
 
-const TransactionItem = () => {
+const TransactionItem = ({ from, to, amount, time }) => {
     const classes = useStyles();
 
     return (
         <>
             <Grid className={classes.root} container>
-                <Grid item xs={5}>
-                    <Typography variant="body1" component="p" className={classes.address}>
-                        0x12412412412412412412412411111111111111111111111
-                    </Typography>
-                </Grid>
-                <Grid item xs={5}>
-                    <Typography variant="body1" component="p" className={classes.address}>
-                        0x12412412412412412412412411111111111111111111111
-                    </Typography>
-                </Grid>
-                <Grid item xs={2}>
+                <Grid item xs={2} className={classes.item}>
                     <Typography variant="body1" component="p">
-                        200
+                        {time}
+                    </Typography>
+                </Grid>
+                <Grid item xs={4} className={classes.item}>
+                    <Typography variant="body1" component="p" className={classes.address}>
+                        {from}
+                    </Typography>
+                </Grid>
+                <Grid item xs={4} className={classes.item}>
+                    <Typography variant="body1" component="p" className={classes.address}>
+                        {to}
+                    </Typography>
+                </Grid>
+                <Grid item xs={2} className={classes.item}>
+                    <Typography variant="body1" component="p">
+                        {amount}
                     </Typography>
                 </Grid>
             </Grid>
@@ -39,6 +44,12 @@ const useStyles = makeStyles({
         textOverflow: 'ellipsis',
         whiteSpace: 'nowrap',
         overflow: 'hidden'
+    },
+    item: {
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center'
     }
 });
 

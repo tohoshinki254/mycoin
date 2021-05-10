@@ -4,28 +4,23 @@ import TransactionItem from './transaction-item';
 import TableTitle from './table-title';
 import Pagination from '@material-ui/lab/Pagination';
 
-const TableBlocks = () => {
+const TableBlocks = ({ page, totalPage, transactions, pageChange }) => {
     const classes = useStyles();
-    const [page, setPage] = useState(1);
-    const [totalPage, setTotalPage] = useState(10);
-    const [transactionList, setTransactionList] = useState([]);
 
     return (
         <>
             <Grid className={classes.container} container>
                 <TableTitle />
-                <TransactionItem />
-                <TransactionItem />
-                <TransactionItem />
-                <TransactionItem />
-                <TransactionItem />
-                <TransactionItem />
-                <TransactionItem />
-                <TransactionItem />
-                <TransactionItem />
+                {transactions.map(item => <TransactionItem {...item} />)}
             </Grid>
             <Grid style={{ marginTop: '2%' }} container justify='center'>
-                <Pagination count={totalPage} page={page} color='primary' size='large' />
+                <Pagination 
+                    count={totalPage} 
+                    page={page} 
+                    color='primary' 
+                    size='large' 
+                    onChange={pageChange}
+                />
             </Grid>
         </>
     )

@@ -22,10 +22,10 @@ function App() {
       }
     }
 
-    window.addEventListener("beforeunload", (e) => {
-      e.preventDefault();
-      handleRefresh();
-    })
+    // window.addEventListener("beforeunload", (e) => {
+    //   e.preventDefault();
+    //   handleRefresh();
+    // })
   }, []);
 
   return (
@@ -36,8 +36,8 @@ function App() {
         </Route>
         <Route path="/wallet" component={AccessPage} />
         <Route path="/dashboard" component={HomePage} />
-        <Route path="/blocks" component={LatestBlocksPage} />
-        <Route path="/transactions" component={LatestTransactionsPage} />
+        <Route path="/blocks/:address" component={LatestBlocksPage} />
+        <Route path="/transactions/:address" component={LatestTransactionsPage} />
       </Switch>
     </AppContext.Provider>
   );

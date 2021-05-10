@@ -12,11 +12,12 @@ import SendTransactionDialog from './send-transaction-dialog';
 import MineBlockCard from './mine-block-card';
 import { PRIVATE_KEY, PUBLIC_KEY } from '../../global/constants';
 import * as Actions from '../../actions/actions';
-import { Redirect } from 'react-router';
+import { Redirect, useHistory } from 'react-router-dom';
 import { AppContext } from '../../contexts/AppContext';
 
 const HomePage = () => {
     const classes = useStyles();
+    let history = useHistory();
     const { isAccessed } = useContext(AppContext);
     const [openBalanceDialog, setOpenBalanceDialog] = useState(false);
     const [openSendTransactionDialog, setOpenSendTransactionDialog] = useState(false);
@@ -38,7 +39,15 @@ const HomePage = () => {
         setOpenSendTransactionDialog(false);
     }
 
-    if (!isAccessed) {
+    const seeBlockCardClick = () => {
+        history.push('/blocks/all');
+    }
+
+    const seeTransactionCardClick = () => {
+        history.push('/transactions/all');
+    }
+
+    if (!isAccessed || localStorage.getItem(PUBLIC_KEY) === null) {
         return <Redirect to='/wallet'/>
     }
 
@@ -64,7 +73,7 @@ const HomePage = () => {
                     <MineBlockCard />
                 </Grid>
                 <Grid className={classes.cardInfo} item xs={6}>
-                    <SeeBlocksCard />
+                    <SeeBlocksCard clickEvent={() => seeBlockCardClick()} />
                 </Grid>
             </Grid>
 
@@ -74,7 +83,7 @@ const HomePage = () => {
                     <SendTransactionCard openDialog={() => setOpenSendTransactionDialog(true)}/>
                 </Grid>
                 <Grid className={classes.cardInfo} item xs={6}>
-                    <SeeTransactionsCard />
+                    <SeeTransactionsCard clickEvent={() => seeTransactionCardClick()} />
                 </Grid>
             </Grid>
 

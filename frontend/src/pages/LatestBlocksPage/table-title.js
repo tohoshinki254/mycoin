@@ -5,31 +5,30 @@ import BoldTextTypography from '../../components/BoldTextTypography';
 const TableTitle = () => {
     const classes = useStyles();
 
-    // index - time - Txn - Miner - Reward
     return (
         <>
             <Grid className={classes.root} container>
-                <Grid item xs={2}>
+                <Grid item xs={1} className={classes.item}>
                     <BoldTextTypography variant="body1" component="p">
                         Block
                     </BoldTextTypography>
                 </Grid>
-                <Grid item xs={3}>
+                <Grid item xs={3} className={classes.item}>
                     <BoldTextTypography variant="body1" component="p">
                         Time mined
                     </BoldTextTypography>
                 </Grid>
-                <Grid item xs={1}>
+                <Grid item xs={1} className={classes.item}>
                     <BoldTextTypography variant="body1" component="p">
                         Txn
                     </BoldTextTypography>
                 </Grid>
-                <Grid item xs={5}>
+                <Grid item xs={6} className={classes.item}>
                     <BoldTextTypography variant="body1" component="p">
                         Miner
                     </BoldTextTypography>
                 </Grid>
-                <Grid item xs={1}>
+                <Grid item xs={1} className={classes.item}>
                     <BoldTextTypography variant="body1" component="p">
                         Reward
                     </BoldTextTypography>
@@ -53,6 +52,12 @@ const useStyles = makeStyles({
         textOverflow: 'ellipsis',
         whiteSpace: 'nowrap',
         overflow: 'hidden'
+    },
+    item: {
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center'
     }
 });
 

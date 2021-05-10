@@ -1,30 +1,26 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Grid, makeStyles } from '@material-ui/core';
 import BlockItem from './block-item';
 import TableTitle from './table-title';
 import Pagination from '@material-ui/lab/Pagination';
 
-const TableBlocks = () => {
+const TableBlocks = ({ page, totalPage, blocks, pageChange }) => {
     const classes = useStyles();
-    const [page, setPage] = useState(1);
-    const [totalPage, setTotalPage] = useState(10);
-    const [blockList, setBlockList] = useState([]);
 
     return (
         <>
             <Grid className={classes.container} container>
                 <TableTitle />
-                <BlockItem />
-                <BlockItem />
-                <BlockItem />
-                <BlockItem />
-                <BlockItem />
-                <BlockItem />
-                <BlockItem />
-                <BlockItem />
+                {blocks.map(item => <BlockItem {...item} />)}
             </Grid>
             <Grid style={{ marginTop: '2%' }} container justify='center'>
-                <Pagination count={totalPage} page={page} color='primary' size='large' />
+                <Pagination 
+                    count={totalPage} 
+                    page={page} 
+                    color='primary' 
+                    size='large'  
+                    onChange={pageChange}
+                />
             </Grid>
         </>
     )

@@ -48,81 +48,119 @@ export const sendTransaction = (privateKey, publicKey, amount, setStatus) => {
     .then((response) => {
         if (response.status === 200) {
             setStatus({ successful: true, message: response.data.message });
+            alert('Send transaction successfully !');
         } else {
             setStatus({ successful: false, message: response.data.message });
+            alert(response.data.message);
         }
     })
     .catch((error) => {
         setStatus({ successful: false, message: 'ERROR!' });
+        alert('ERROR!');
     })
 };
 
-export const mineBlock = (privateKey, setStatus) => {
+export const mineBlock = (privateKey, setStatus, setProgress) => {
     Services.apiMineBlock(privateKey)
     .then((response) => {
         if (response.status === 200) {
             setStatus({ successful: true, data: response.data });
+            setProgress(false);
         } else {
             setStatus({ successful: false, data: null });
+            alert(response.data.message);
         }
     })
     .catch((error) => {
         setStatus({ successful: false, data: null });
+        alert('ERROR!');
     })
 };
 
-export const getAllTransactions = (page, setStatus) => {
+export const getAllTransactions = (page, setPage, setTotalPage, setListTransactions) => {
     Services.apiGetAllTransactions(page)
     .then((response) => {
         if (response.status === 200) {
-            setStatus({ successful: true, data: response.data });
+            setPage(response.data.curPage);
+            setTotalPage(response.data.totalPages);
+            setListTransactions(response.data.data)
         } else {
-            setStatus({ successful: false, data: null });
+            setPage(0);
+            setTotalPage(0);
+            setListTransactions([]);
+            alert('ERROR!');
         }
     })
     .catch((error) => {
-        setStatus({ successful: false, data: null });
+        setPage(0);
+        setTotalPage(0);
+        setListTransactions([]);
+        alert('ERROR!');
     })
 };
 
-export const getTransactionOfAddress = (publicKey, page, setStatus) => {
+export const getTransactionOfAddress = (publicKey, page, setPage, setTotalPage, setListTransactions) => {
     Services.apiGetTransactionOfAddress(publicKey, page)
     .then((response) => {
         if (response.status === 200) {
-            setStatus({ successful: true, data: response.data });
+            setPage(response.data.curPage);
+            setTotalPage(response.data.totalPages);
+            setListTransactions(response.data.data);
         } else {
-            setStatus({ successful: false, data: null });
+            setPage(0);
+            setTotalPage(0);
+            setListTransactions([]);
+            alert(response.data.message);
         }
     })
     .catch((error) => {
-        setStatus({ successful: false, data: null });
+        setPage(0);
+        setTotalPage(0);
+        setListTransactions([]);
+        alert('ERROR!');
     })
 };
 
-export const getAllBlocks = (page, setStatus) => {
+export const getAllBlocks = (page, setPage, setTotalPage, setListBlocks) => {
     Services.apiGetAllBlocks(page)
     .then((response) => {
         if (response.status === 200) {
-            setStatus({ successful: true, data: response.data });
+            setPage(response.data.curPage);
+            setTotalPage(response.data.totalPages);
+            setListBlocks(response.data.data);
         } else {
-            setStatus({ successful: false, data: null });
+            setPage(0);
+            setTotalPage(1);
+            setListBlocks([]);
+            alert(response.data.message);
         }
     })
     .catch((error) => {
-        setStatus({ successful: false, data: null });
+        setPage(0);
+        setTotalPage(1);
+        setListBlocks([]);
+        alert('ERROR!');
     })
 };
 
-export const getBlockOfAddress = (publicKey, page, setStatus) => {
+export const getBlockOfAddress = (publicKey, page, setPage, setTotalPage, setListBlocks) => {
     Services.apiGetBlockOfAddress(publicKey, page)
     .then((response) => {
         if (response.status === 200) {
-            setStatus({ successful: true, data: response.data });
+            setPage(response.data.curPage);
+            setTotalPage(response.data.totalPages);
+            setListBlocks(response.data.data);
         } else {
-            setStatus({ successful: false, data: null });
+            setPage(0);
+            setTotalPage(0);
+            setListBlocks([]);
+            alert(response.data.message);
         }
     })
     .catch((error) => {
-        setStatus({ successful: false, data: null });
+        setPage(0);
+        setTotalPage(0);
+        setListBlocks([]);
+        alert('ERROR!');
     })
 };

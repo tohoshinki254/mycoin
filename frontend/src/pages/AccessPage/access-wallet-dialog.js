@@ -4,7 +4,7 @@ import BlueTextField from '../../components/BlueTextField';
 import DialogTitle from '../../components/DialogTitle';
 import * as Actions from '../../actions/actions';
 import { PRIVATE_KEY, PUBLIC_KEY } from '../../global/constants';
-import { Redirect } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import { AppContext } from '../../contexts/AppContext';
 
 const AccessButton = withStyles((theme) => ({
@@ -18,6 +18,7 @@ const AccessButton = withStyles((theme) => ({
 }))(Button);
 
 const AccessWalletDialog = ({ open, onCloseClick }) => {
+    let history = useHistory();
     const { setIsAccessed } = useContext(AppContext);
     const [accessWallet, setAccessWallet] = useState({ successful: false, data: null });
     const [key, setKey] = useState("");
@@ -38,11 +39,10 @@ const AccessWalletDialog = ({ open, onCloseClick }) => {
     }
 
     if (accessWallet.successful) {
-        console.log("TRUE");
         localStorage.setItem(PRIVATE_KEY, accessWallet.data.privateKey);
         localStorage.setItem(PUBLIC_KEY, accessWallet.data.publicKey);
         setIsAccessed(true);
-        return <Redirect to='/dashboard' />
+        history.push('/dashboard');
     }
 
     return (
