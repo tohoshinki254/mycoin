@@ -8,6 +8,7 @@ import * as Actions from '../../actions/actions';
 import { AppContext } from '../../contexts/AppContext'; 
 import { PUBLIC_KEY } from '../../global/constants';
 import { Redirect } from 'react-router-dom';
+import socket from '../../global/socket';
 
 const LatestBlocksPage = ({ match }) => {
     const classes = useStyles();
@@ -15,12 +16,22 @@ const LatestBlocksPage = ({ match }) => {
     const [page, setPage] = useState(0);
     const [totalPage, setTotalPage] = useState(0);
     const [listBlocks, setListBlocks] = useState([]);
+    const [reload, setReload] = useState(Math.random());
 
     useEffect(() => {
         if (match.params.address === "all") {
             Actions.getAllBlocks(1, setPage, setTotalPage, setListBlocks);
         } else {
             Actions.getBlockOfAddress(match.params.address, 1, setPage, setTotalPage, setListBlocks);
+        }
+    }, [reload]);
+
+    useEffect(() => {
+        socket.on('reload-list-blocks', () => {
+            setReload(Math.random());
+        })
+        return () => {
+            socket.off('reload-list-blocks');
         }
     }, []);
 

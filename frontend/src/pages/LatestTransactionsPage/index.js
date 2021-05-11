@@ -8,6 +8,7 @@ import { AppContext } from '../../contexts/AppContext';
 import * as Actions from '../../actions/actions';
 import { PUBLIC_KEY } from '../../global/constants';
 import { Redirect } from 'react-router-dom';
+import socket from '../../global/socket';
 
 const LatestTransactionsPage = ({ match }) => {
     const classes = useStyles();
@@ -15,6 +16,7 @@ const LatestTransactionsPage = ({ match }) => {
     const [page, setPage] = useState(0);
     const [totalPage, setTotalPage] = useState(0);
     const [listTransactions, setListTransactions] = useState([]);
+    const [reload, setReload] = useState(Math.random());
 
     useEffect(() => {
         if (match.params.address === "all") {
@@ -22,7 +24,16 @@ const LatestTransactionsPage = ({ match }) => {
         } else {
             Actions.getTransactionOfAddress(match.params.address, 1, setPage, setTotalPage, setListTransactions);
         }
-    }, []);
+    }, [reload]);
+
+    useEffect(() => {
+        socket.on('reload-list-transactions', () => {
+            setReload(Math.random());
+        })
+        return () => {
+            socket.off('reload-list-transactions');
+        }
+    }, [])
 
     const handlePageChange = (event, value) => {
         if (match.params.address === "all") {

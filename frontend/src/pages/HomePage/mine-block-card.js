@@ -3,6 +3,7 @@ import { Card, CardContent, makeStyles, Grid, Button, withStyles, CircularProgre
 import WhiteTextTypography from '../../components/WhiteTextTypography';
 import * as Actions from '../../actions/actions';
 import { PRIVATE_KEY } from '../../global/constants';
+import socket from '../../global/socket';
 
 const MineButton = withStyles((theme) => ({
     root: {
@@ -28,6 +29,12 @@ const MineBlockCard = () => {
     const mineBlockEvent = () => {
         setProgress(true);
         Actions.mineBlock(localStorage.getItem(PRIVATE_KEY), setMineState, setProgress);
+    }
+
+    const updateList = () => {
+        socket.emit('new-block-mined');
+        socket.emit('new-transaction-created');
+        return true;
     }
 
     return (
@@ -56,7 +63,7 @@ const MineBlockCard = () => {
                         
                         <div style={{margin: '2%'}}/>
                         {
-                            mineState.successful && 
+                            mineState.successful && updateList() && 
                             <WhiteTextTypography className={classes.breakAll} variant="body1" component="p">
                                 New block: #{mineState.data.index} <br />
                                 Rewarded: {mineState.data.reward}

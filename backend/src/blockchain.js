@@ -11,6 +11,7 @@ class Blockchain {
     constructor() {
         this.difficulty = 4;
         this.pendingTransaction = [];
+        this.pendingTxOuts = [];
         this.infoTransaction = [];
         this.miningReward = 100;
         this.unspentTxOut = [];
@@ -29,7 +30,7 @@ const createCoinbaseTransaction = (address, reward, blockchain) => {
     const txOuts = [new TxOut(address, reward)];
     const coinBaseTx = new Transaction('', txIns, txOuts);
     coinBaseTx.id = getTransactionId(coinBaseTx);
-    
+
     let idx = 0
     for (const txOut of txOuts) {
         const data = {
@@ -78,8 +79,13 @@ const minePendingTransactions = (miningRewardAddress, blockchain) => {
     const newHash = mineBlock(block, blockchain.difficulty);
 
     if (isValidNewBlock(block, latestBlock)) {
+        for (const txOut of blockchain.pendingTxOuts) {
+            blockchain.unspentTxOut.push(txOut);
+        }        
+
         blockchain.chain.push(block);
         blockchain.pendingTransaction = [];
+        blockchain.pendingTxOuts = [];
         
         const info = [];
         for (const element of blockchain.infoTransaction) {
@@ -167,9 +173,13 @@ const sendTransaction = (privateKey, receiverAddress, amount, blockchain) => {
             txOutId: tx.id,
             txOutIndex: idx,
             address: txOut.address,
-            amount: txOut.amount
+            amount: Number(txOut.amount)
         };
-        blockchain.unspentTxOut.push(unSpent);
+        if (txOut.address === senderAddress) {
+            blockchain.unspentTxOut.push(unSpent);
+        } else {
+            blockchain.pendingTxOuts.push(unSpent);
+        }
         idx++;
     }
 
@@ -187,7 +197,7 @@ const getBalance = (address, aUnspentTxOuts) => {
     let balance = 0;
     for (const uTxO of aUnspentTxOuts) {
         if (uTxO.address === address) {
-            balance += uTxO.amount;
+            balance += Number(uTxO.amount);
         }
     }
     return balance;
