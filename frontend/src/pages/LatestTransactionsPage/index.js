@@ -7,7 +7,7 @@ import TableTransactions from './table-transactions';
 import { AppContext } from '../../contexts/AppContext';
 import * as Actions from '../../actions/actions';
 import { PUBLIC_KEY } from '../../global/constants';
-import { Redirect } from 'react-router-dom';
+import { Redirect, useHistory } from 'react-router-dom';
 import socket from '../../global/socket';
 
 const LatestTransactionsPage = ({ match }) => {
@@ -17,6 +17,7 @@ const LatestTransactionsPage = ({ match }) => {
     const [totalPage, setTotalPage] = useState(0);
     const [listTransactions, setListTransactions] = useState([]);
     const [reload, setReload] = useState(Math.random());
+    let history = useHistory();
 
     useEffect(() => {
         if (match.params.address === "all") {
@@ -43,6 +44,11 @@ const LatestTransactionsPage = ({ match }) => {
         }
     }
 
+    const handleSearchClick = (address) => {
+        const to = '/transactions/' + address;
+        history.push(to);
+    }
+
     if (!isAccessed || localStorage.getItem(PUBLIC_KEY) === null) {
         return <Redirect to='/wallet' />
     }
@@ -51,7 +57,7 @@ const LatestTransactionsPage = ({ match }) => {
         <div className={classes.root}>
             <TopNavigator isAccessed={false} />
             <div className={classes.searchField}>
-                <SearchBar />
+                <SearchBar search={handleSearchClick}/>
             </div>
 
             <TableTransactions 
