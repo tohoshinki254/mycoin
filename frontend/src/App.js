@@ -22,10 +22,10 @@ function App() {
       }
     }
 
-    // window.addEventListener("beforeunload", (e) => {
-    //   e.preventDefault();
-    //   handleRefresh();
-    // })
+    window.addEventListener("beforeunload", (e) => {
+      e.preventDefault();
+      handleRefresh();
+    })
   }, []);
 
   return (

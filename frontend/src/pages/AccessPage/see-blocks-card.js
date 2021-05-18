@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Card, CardContent, makeStyles } from '@material-ui/core';
 import WhiteTextTypography from '../../components/WhiteTextTypography';
 
-const SeeTransactionsCard = ({ clickEvent }) => {
+const SeeBlocksCard = ({ clickEvent }) => {
     const classes = useStyles();
 
     return (
@@ -12,7 +12,7 @@ const SeeTransactionsCard = ({ clickEvent }) => {
                     Latest
                 </WhiteTextTypography>
                 <WhiteTextTypography variant="h4" component="h4">
-                    Transactions
+                    Blocks
                 </WhiteTextTypography>
             </CardContent>
         </Card>
@@ -22,10 +22,11 @@ const SeeTransactionsCard = ({ clickEvent }) => {
 const useStyles = makeStyles({
     root: {
         width: '90%',
-        height: 170,
+        height: 200,
         backgroundImage: "url('/assets/images/blocks.jpeg')",
         backgroundSize: '100%',
-        cursor: 'pointer'
+        cursor: 'pointer',
+        margin: '5%'
     },
     content: {
         paddingLeft: '10%',
@@ -33,4 +34,4 @@ const useStyles = makeStyles({
     }
 });
 
-export default SeeTransactionsCard;
+export default SeeBlocksCard;

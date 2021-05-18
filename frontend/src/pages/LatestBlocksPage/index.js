@@ -49,10 +49,6 @@ const LatestBlocksPage = ({ match }) => {
         history.push(to);
     }
 
-    if (!isAccessed || localStorage.getItem(PUBLIC_KEY) === null) {
-        return <Redirect to='/wallet' />
-    }
-
     return (
         <div className={classes.root}>
             <TopNavigator isAccessed={false} />

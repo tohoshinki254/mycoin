@@ -5,10 +5,14 @@ import MediaCard from '../../components/MediaCard';
 import BottomNavigator from '../../components/BottomNavigator';
 import CreateWalletDialog from './create-wallet-dialog';
 import AccessWalletDialog from './access-wallet-dialog';
+import SeeBlocksCard from './see-blocks-card';
+import SeeTransactionsCard from './see-transactions-card';
+import { useHistory } from 'react-router-dom';
 import * as Actions from '../../actions/actions';
 
 const AccessPage = () => {
     const classes = useStyles();
+    let history = useHistory();
     const [openCreate, setOpenCreate] = useState(false);
     const [openAccess, setOpenAccess] = useState(false);
     const [initWallet, setInitWallet] = useState({ successful: false, data: null });
@@ -18,6 +22,14 @@ const AccessPage = () => {
 
     const initWalletEvent = () => {
         Actions.createWallet(setInitWallet, setOpenCreate);
+    }
+
+    const seeBlockCardClick = () => {
+        history.push('/blocks/all');
+    }
+
+    const seeTransactionCardClick = () => {
+        history.push('/transactions/all');
     }
 
     return (
@@ -31,7 +43,7 @@ const AccessPage = () => {
                     <img src="/assets/images/big-spaceman.1b378c1b.png" width='70%' height='100%'/>
                 </Grid>
             </Grid>
-            <Grid container style={{ paddingBottom: '7%'}}>
+            <Grid container>
                 <Grid className={classes.createCard} item xs={6}>
                     <MediaCard 
                         title="Create A New Wallet"
@@ -49,6 +61,14 @@ const AccessPage = () => {
                         theme={false}
                         onClick={() => setOpenAccess(true)}
                     />
+                </Grid>
+            </Grid>
+            <Grid container style={{ paddingBottom: '7%'}}>
+                <Grid className={classes.createCard} item xs={6}>
+                    <SeeBlocksCard clickEvent={() => seeBlockCardClick()} />
+                </Grid>
+                <Grid className={classes.accessCard} item xs={6}>
+                    <SeeTransactionsCard clickEvent={() => seeTransactionCardClick()} />
                 </Grid>
             </Grid>
             <BottomNavigator />

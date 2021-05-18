@@ -9,7 +9,7 @@ class Blockchain {
      * @param {UnspentTxOut[]} unspentTxOut
      */
     constructor() {
-        this.difficulty = 4;
+        this.difficulty = 5;
         this.pendingTransaction = [];
         this.pendingTxOuts = [];
         this.infoTransaction = [];

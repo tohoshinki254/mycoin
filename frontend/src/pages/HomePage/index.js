@@ -6,8 +6,6 @@ import AddressCard from './address-card';
 import BalanceCard from './balance-card';
 import BalanceDialog from './balance-dialog';
 import SendTransactionCard from './send-transaction-card';
-import SeeBlocksCard from './see-blocks-card';
-import SeeTransactionsCard from './see-transactions-card';
 import SendTransactionDialog from './send-transaction-dialog';
 import MineBlockCard from './mine-block-card';
 import { PRIVATE_KEY, PUBLIC_KEY } from '../../global/constants';
@@ -39,14 +37,6 @@ const HomePage = () => {
         setOpenSendTransactionDialog(false);
     }
 
-    const seeBlockCardClick = () => {
-        history.push('/blocks/all');
-    }
-
-    const seeTransactionCardClick = () => {
-        history.push('/transactions/all');
-    }
-
     if (!isAccessed || localStorage.getItem(PUBLIC_KEY) === null) {
         return <Redirect to='/wallet'/>
     }
@@ -63,7 +53,7 @@ const HomePage = () => {
                         balance={balance.successful ? balance.data.balance : "-INF"}
                         openDialog={() => setOpenBalanceDialog(true)}
                         refreshEvent={() => getBalance(localStorage.getItem(PUBLIC_KEY))}
-                    />
+                    /> 
                 </Grid>
             </Grid>
 
@@ -73,17 +63,7 @@ const HomePage = () => {
                     <MineBlockCard />
                 </Grid>
                 <Grid className={classes.cardInfo} item xs={6}>
-                    <SeeBlocksCard clickEvent={() => seeBlockCardClick()} />
-                </Grid>
-            </Grid>
-
-            <div style={{ marginBottom: '7%' }}/>
-            <Grid container>
-                <Grid className={classes.cardInfo} item xs={6}>
-                    <SendTransactionCard openDialog={() => setOpenSendTransactionDialog(true)}/>
-                </Grid>
-                <Grid className={classes.cardInfo} item xs={6}>
-                    <SeeTransactionsCard clickEvent={() => seeTransactionCardClick()} />
+                <SendTransactionCard openDialog={() => setOpenSendTransactionDialog(true)}/>
                 </Grid>
             </Grid>
 

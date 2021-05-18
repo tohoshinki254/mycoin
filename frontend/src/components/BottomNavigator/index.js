@@ -8,7 +8,7 @@ const BottomNavigator = () => {
     return (
         <div className={classes.root}>
             <WhiteTextTypography>
-                MyEtherWallet © 1712813 - Nguyen Thanh Tien
+                MyCoin © 1712813 - Nguyen Thanh Tien
             </WhiteTextTypography>
         </div>
     )
